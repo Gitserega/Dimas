@@ -1,14 +1,18 @@
 @extends('layouts.app')
 @section('head')
-
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 @endsection
 @section('content')
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
     <section class="hero-section">
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
                     <h1>Профессиональный груминг салон для кошек и собак</h1>
                     <p class="subtitle">Лучший друг заслуживает лучшего ухода</p>
+                    <a href="{{route('records.create')}}" class="appointment-button">Записаться</a>
                 </div>
                 <div class="hero-image">
                     <img src="{{ asset('images/22.png') }}" alt="Груминг для питомцев">
@@ -16,8 +20,14 @@
             </div>
         </div>
     </section>
+    <div class="scroll-dots">
+        <div class="scroll-dot" data-section="0"></div>
+        <div class="scroll-dot" data-section="1"></div>
+        <div class="scroll-dot" data-section="2"></div>
 
-    <section class="dogo-section">
+
+    </div>
+    <section class="dogo-section services-screen">
         <div class="dogo-text">
             <h2>Груминг - забота о вашем питомце</h2>
         </div>
@@ -90,282 +100,112 @@
             </div>
             </section>
 
-    <style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('section');
+            const dots = document.querySelectorAll('.scroll-dot');
+            const progressBar = document.querySelector('.scroll-progress-bar');
+            let currentSection = 0;
+            let isScrolling = false;
+            let scrollTimeout;
 
-.dogo-section {
-    padding: 35px 0;
-    background-color: #f9f9f9;
-}
+            // Обновление активной точки и прогресс-бара
+            function updateUI() {
+                // Обновляем точки навигации
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentSection);
+                });
 
-.dogo-text h2 {
-    text-align: center;
-    margin-bottom: 40px;
-    color: #333;
-}
+                // Обновляем прогресс-бар
+                const scrollPercentage = (currentSection / (sections.length - 1)) * 100;
+                progressBar.style.width = `${scrollPercentage}%`;
+            }
 
-.dogo-gallery {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    max-width: 1200px;
-    margin-left: 115px;
-}
+            // Плавный скролл к секции
+            function scrollToSection(index) {
+                if (index < 0 || index >= sections.length) return;
 
-.gallery-column {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 25%;
-}
+                currentSection = index;
+                isScrolling = true;
 
-.center-image {
-    flex: 1;
-    text-align: center;
-    align-self: flex-start; /* Поднимаем к верхнему краю */
-    margin-top: -100px; /* Дополнительный подъем */
-    position: relative; /* Для возможного z-index */
-    z-index: 1; /* Чтобы было выше фона */
-}
+                let offset = 0;
+                if (index === 1) { // Для второй секции (индекс 1)
+                    offset = 150; // Такой же отступ, как в CSS
+                }
 
-.center-image img {
-    max-width: 120%;
-    height: auto;
-    border-radius: 8px;
-}
+                window.scrollTo({
+                    top: sections[index].offsetTop - offset,
+                    behavior: 'smooth'
+                });
 
-/* Стиль для цифры (PNG) */
+                updateUI();
 
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 800);
+            }
 
-.gallery-item img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    margin-right: 2px; /* Отступ справа от цифры */
-    margin-top: 30px; /* Поднимаем цифру для визуального слияния */
-}
+            // Обработчик колеса мыши
+            window.addEventListener('wheel', (e) => {
+                if (isScrolling) return;
 
-/* Стиль для текстового блока */
-.text-item {
-    margin-right: 5cm; /* Отступ справа от цифры */
-    margin-top: -30px; /* Поднимаем цифру для визуального слияния */
-}
+                if (e.deltaY > 0 && currentSection < sections.length - 1) {
+                    scrollToSection(currentSection + 1);
+                } else if (e.deltaY < 0 && currentSection > 0) {
+                    scrollToSection(currentSection - 1);
+                }
+            }, { passive: false });
 
-.text-item img {
-    width: 400px; /* Размер иконки в тексте */
-    height: 120px;
-    object-fit: contain;
-    float: left;
-}
+            // Обработчик касаний для мобильных устройств
+            let touchStartY = 0;
+            window.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
 
-/* Адаптивность */
-@media (max-width: 768px) {
-    .dogo-gallery {
-        flex-direction: column;
-        align-items: center;
-    }
+            window.addEventListener('touchend', (e) => {
+                if (isScrolling) return;
 
-    .gallery-column,
-    .center-image {
-        width: 90%;
-    }
+                const touchEndY = e.changedTouches[0].clientY;
+                const diff = touchStartY - touchEndY;
 
-    .gallery-column {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+                if (Math.abs(diff) > 50) { // Порог для срабатывания
+                    if (diff > 0 && currentSection < sections.length - 1) {
+                        scrollToSection(currentSection + 1);
+                    } else if (diff < 0 && currentSection > 0) {
+                        scrollToSection(currentSection - 1);
+                    }
+                }
+            }, { passive: true });
 
-    .gallery-item {
-        width: 45%;
-        margin: 5px;
-    }
-}
+            // Клик по точкам навигации
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const sectionIndex = parseInt(dot.getAttribute('data-section'));
+                    scrollToSection(sectionIndex);
+                });
+            });
 
-.cat-section:nth-child(odd) {
-    /* background-color: #f7f5f3; */
-    width: 100%;
-    max-width: 2000px; /* Максимальная ширина */
-    height: 700px; /* Жестко заданная высота */
-    overflow: hidden; /* Обрезаем содержимое, если выходит за границы */
+            // Обновление при загрузке
+            updateUI();
 
-}
+            // Обновление при ручном скролле
+            window.addEventListener('scroll', () => {
+                if (isScrolling) return;
 
-.cat-text h2 {
-    font-size: 3.0rem;
-    color: #f7f4f4;
-    margin-bottom: 20px;
-    line-height: 2.7;
-    text-align: center;
-}
+                const scrollPosition = window.scrollY + (window.innerHeight / 2);
+                const offset = 80; // Совпадает с margin-bottom
 
-        /* Новые стили для второй секции */
-/* Стили для полноразмерной картинки */
-.cat-image {
-    margin-top: -600px;
-    flex: 1;
-    text-align: right;
-    margin-right: 40px;
-}
+                sections.forEach((section, index) => {
+                    const sectionTop = section.offsetTop - (index > 0 ? offset : 0);
+                    const sectionBottom = sectionTop + section.offsetHeight;
 
-.cat-image img {
-    max-width: 500px;
-    width: 500px;
-    height: auto;
-    border-radius: 4;
-    margin-top: 0.1cm;
-}
-
-.cat-text h3 {
-    font-size: 3.0rem;
-    color: #020202;
-    margin-bottom: 0.8px;
-    line-height: 2.7;
-    text-align: left;
-    margin-left: 60px;
-}
-
-.review-image {
-    flex: 1;
-    text-align: left;
-    margin-top: 10px;
-    margin-left: 40px;
-}
-
-.review-column {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 25%;
-}
-
-/* Для адаптивности */
-@media (max-width: 768px) {
-    .cat-image {
-        height: 50vh; /* На половину высоты экрана на мобильных */
-    }
-}
-
-
-.dogo-section:nth-child(even) {
-    background-color: #e7ae63;
-    width: 100%;
-    height: 650px;
-    overflow: hidden;
-    padding: 35px 0;
-}
-.dogo-gallery {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.dogo-text h2 {
-    font-size: 3.0rem;
-    color: #f7f4f4;
-    margin-bottom: 5px;
-    line-height: 0.01cm;
-    text-align: center;
-}
-
-
-        /* Base Styles */
-:root {
-    --secondary: #0c0c0c; /*Контакты и Соцсети - следите за нами!*/
-    --dark: #fefafa;/*Фон footer*/
-    --light: #fdfafa;/*???*/
-}
-/*header*/
-body {
-    font-family: 'Montserrat', sans-serif;
-            color: var(--text);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            padding-top: 70px; /* Отступ для фиксированного хедера */
-}
-
-.container {
-    width: 0%;
-    max-width: 0;
-    margin: 0 auto;
-}
-
-
-.container {
-    width: 9%;
-    max-width: 10px;
-    margin: 0 auto;
-}
-
-/* Hero section */
-.hero-section {
-    width: 100%;
-    padding: 100px;
-    /* background-color: #f9f9f9; */
-}
-
-.container {
-    width: 100%;
-    /* max-width: 1200px; */
-    margin: 0 auto;
-}
-
-.hero-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0;
-    width: 100%;
-}
-
-.hero-text {
-    flex: 1;
-    max-width: 1000px;
-}
-
-.hero-image {
-    flex: 1;
-    text-align: right;
-    margin-bottom: 50px;
-}
-
-.hero-image img {
-    max-width: 600px;
-    width: 100%;
-    height: auto;
-    border-radius: 0;
-}
-
-.hero-text h1 {
-    font-size: 4.0rem;
-    color: #040404;
-    margin-bottom: 20px;
-    line-height: 1.3;
-}
-
-.hero-text .subtitle {
-    font-size: 2.0rem;
-    color: #080808;
-    margin-bottom: 30px;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .hero-content {
-        flex-direction: column;
-    }
-
-    .hero-image {
-        order: -1;
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .hero-text {
-        text-align: center;
-    }
-}
-    </style>
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                        currentSection = index;
+                        updateUI();
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

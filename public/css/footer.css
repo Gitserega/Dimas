@@ -1,0 +1,135 @@
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+
+.footer__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    border-top: 1px solid rgba(235, 141, 11, 0.937);
+    padding-top: 2rem;
+}
+
+/* Стили для блока контактов */
+.footer__contacts {
+    max-width: 350px;
+}
+
+/* Стили для блока соцсетей */
+.footer__social {
+    max-width: 350px;
+    margin-left: auto;
+}
+
+.footer__title {
+    font-family: 'Roboto Slab', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    color: var(--secondary);
+}
+
+.footer__text {
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Стили для соцсетей */
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.social-link {
+    color: rgb(5, 5, 5);
+    text-decoration: none;
+    transition: color 0.3s;
+    font-size: 0.9rem;
+}
+
+.social-link:hover {
+    color: var(--secondary);
+}
+
+.footer__copyright {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(235, 141, 11, 0.937);
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 80px;
+    box-sizing: border-box;
+}
+
+
+.location-header h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.location-header p {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.map-error p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+.contact-card h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.contact-card p {
+    color: #7f8c8d;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .location-header h1 {
+        font-size: 2rem;
+    }
+}
+
+ .alert-danger ul {
+     padding-left: 20px;
+     margin-bottom: 0;
+ }
+
+ body {
+     background-image: url('/images/paws-background.png');
+     background-size: cover;
+     background-attachment: fixed;
+     background-position: center;
+     background-repeat: no-repeat;
+     min-height: 100vh;
+ }
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.85);
+    z-index: -1;
+}
+
+.alert-danger ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+}
